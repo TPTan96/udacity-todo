@@ -19,7 +19,13 @@ provider:
   tracing:
     lambda: true
     apiGateway: true
-
+    iamRoleStatements:         
+      - Effect: 'Allow'        
+        Action:
+          - 'xray:PutTraceSegments'            
+          - 'xray:PutTelemetryRecords'         
+        Resource:
+          - '*'
   # Use these variables in the functions and resouorces section below. For example, 
   # ${self:provider.environment.ATTACHMENT_S3_BUCKET}
   environment:
@@ -75,10 +81,12 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
+          request:
+            schemas:
+              application/json: ${file(models/create-todo-model.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - dynamodb:Query
           - dynamodb:PutItem
         Resource: !GetAtt TodosTable.Arn
   # TODO: Configure this function
@@ -89,9 +97,8 @@ functions:
       - http:
           method: patch
           path: todos/{todoId}
-          authorizer: Auth
           cors: true
-
+          authorizer: Auth
           request:
             schemas:
               application/json: ${file(models/update-todo-model.json)}
@@ -109,8 +116,8 @@ functions:
       - http:
           method: delete
           path: todos/{todoId}
-          authorizer: Auth
           cors: true
+          authorizer: Auth
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -123,18 +130,18 @@ functions:
       - http:
           method: post
           path: todos/{todoId}/attachment
-          authorizer: Auth
           cors: true
+          authorizer: Auth
     iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:UpdateItem
-        Resource: !GetAtt TodosTable.Arn
       - Effect: Allow
         Action:
           - s3:PutObject
           - s3:GetObject
         Resource: !GetAtt AttachmentsBucket.Arn
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: !GetAtt TodosTable.Arn
 
 resources:
   Resources:

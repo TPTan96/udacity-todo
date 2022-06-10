@@ -4,15 +4,23 @@
   "type": "object",
   "properties": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "$ref": "#/definitions/non-empty-string"
     },
     "dueDate": {
-      "type": "string"
+      "type": "string",
+      "$ref": "#/definitions/non-empty-string"
     }
   },
   "required": [
     "name",
     "dueDate"
   ],
+  "definitions": {
+    "non-empty-string": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
   "additionalProperties": false
 }

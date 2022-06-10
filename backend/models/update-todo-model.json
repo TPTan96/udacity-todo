@@ -4,10 +4,12 @@
   "type": "object",
   "properties": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "$ref": "#/definitions/non-empty-string"
     },
     "dueDate": {
-      "type": "string"
+      "type": "string",
+      "$ref": "#/definitions/non-empty-string"
     },
     "done": {
       "type": "boolean"
@@ -18,5 +20,11 @@
     "dueDate",
     "done"
   ],
+  "definitions": {
+    "non-empty-string": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
   "additionalProperties": false
 }
