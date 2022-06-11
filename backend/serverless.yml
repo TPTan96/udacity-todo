@@ -124,6 +124,23 @@ functions:
           - dynamodb:DeleteItem
         Resource: !GetAtt TodosTable.Arn
 
+  FindTodos:
+    handler: src/lambda/http/findTodo.handler
+    events:
+      - http:
+          method: post
+          path: find/todos
+          cors: true
+          authorizer: Auth 
+          request:
+            schemas:
+              application/json: ${file(models/find-todo-model.json)}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: !GetAtt TodosTable.Arn
+
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     events:

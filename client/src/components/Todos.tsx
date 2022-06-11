@@ -11,11 +11,12 @@ import {
   Icon,
   Input,
   Image,
-  Loader
+  Loader,
 } from 'semantic-ui-react'
 
-import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
+import { createTodo, deleteTodo, findTodo, getTodos, patchTodo } from '../api/todos-api'
 import Auth from '../auth/Auth'
+import { FindTodoRequest } from '../types/FindTodoRequest'
 import { Todo } from '../types/Todo'
 
 interface TodosProps {
@@ -27,21 +28,52 @@ interface TodosState {
   todos: Todo[]
   newTodoName: string
   loadingTodos: boolean
+  search: string
 }
 
 export class Todos extends React.PureComponent<TodosProps, TodosState> {
   state: TodosState = {
     todos: [],
     newTodoName: '',
-    loadingTodos: true
+    loadingTodos: true,
+    search: '',
   }
 
   handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ newTodoName: event.target.value })
   }
 
+  handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ search: event.target.value })
+  }
+
   onEditButtonClick = (todoId: string) => {
     this.props.history.push(`/todos/${todoId}/edit`)
+  }
+
+  onSearch = async (event: React.ChangeEvent<HTMLButtonElement>) => {
+    try {
+      this.setState({
+        loadingTodos: true
+      })
+      const v = this.state.search
+      if (!v) {
+        this.componentDidMount()
+        return
+      }
+      const req:FindTodoRequest = {name: v}
+      const userId = this.props.auth.getIdToken()
+      const todos = await findTodo(userId, req)
+      this.setState({
+        todos: todos,
+        loadingTodos: false
+      })
+
+    } catch (e: any) {
+      if (e) {
+        alert(`Fail to search: ${e.message}`)
+      }
+    }
   }
 
   onTodoCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
@@ -104,6 +136,8 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
   render() {
     return (
       <div>
+        {this.renderSearchBox()}
+
         <Header as="h1">TODOs</Header>
 
         {this.renderCreateTodoInput()}
@@ -202,6 +236,27 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
           )
         })}
       </Grid>
+    )
+  }
+
+  renderSearchBox() {
+    return (
+      <Grid.Row>
+        <Grid.Column width={16}>
+          <Input
+            fluid={true}
+            placeholder="..."
+            action={{
+              color: 'blue',
+              labelPosition: 'right',
+              icon: 'search',
+              content: 'Search',
+              onClick: this.onSearch
+            }}
+            onChange={this.handleSearch}
+          />
+        </Grid.Column>
+      </Grid.Row>
     )
   }
 

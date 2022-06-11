@@ -100,6 +100,24 @@ export class TodosAccess {
     
         logger.info(`Deleting TODO ${todoId} successfully`);
       }
+
+      async findTodo(userId: string, name: string): Promise<TodoItem[]> {
+
+        const result = await this.docClient.query({
+            TableName: this.todosTable,
+            KeyConditionExpression: '#userId =:i',
+            ExpressionAttributeNames: {
+                '#userId': 'userId'
+            },
+            ExpressionAttributeValues: {
+                ':i': userId
+            }
+        }).promise();
+
+        let items = result.Items as TodoItem[]
+        items = items.filter(item => item.name.includes(name))
+        return items
+    }
 }
 
 function createDynamoDBClient(): DocumentClient {
