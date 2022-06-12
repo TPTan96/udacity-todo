@@ -5,7 +5,7 @@ import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate';
 
-// const XAWS = AWSXRay.captureAWS(AWS)
+const XAWS = AWSXRay.captureAWS(AWS)
 
 const logger = createLogger('TodosAccess data')
 
@@ -121,7 +121,7 @@ export class TodosAccess {
 }
 
 function createDynamoDBClient(): DocumentClient {
-    const service = new AWS.DynamoDB();
+    const service = new XAWS.DynamoDB();
     const client = new AWS.DynamoDB.DocumentClient({
         service: service
     });
