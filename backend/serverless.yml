@@ -16,22 +16,20 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
 
-  tracing:
-    lambda: true
-    apiGateway: true
-    iamRoleStatements:         
-      - Effect: 'Allow'        
-        Action:
-          - 'xray:PutTraceSegments'            
-          - 'xray:PutTelemetryRecords'         
-        Resource:
-          - '*'
+  tracing: true
+  iamRoleStatements:         
+    - Effect: 'Allow'        
+      Action:
+        - 'xray:PutTraceSegments'            
+        - 'xray:PutTelemetryRecords'         
+      Resource:
+        - '*'
   # Use these variables in the functions and resouorces section below. For example, 
   # ${self:provider.environment.ATTACHMENT_S3_BUCKET}
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    ATTACHMENT_S3_BUCKET: serverless-tan-p4-todo-images-${self:provider.stage}
+    ATTACHMENT_S3_BUCKET: serverless-tan-p5-todo-images-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
   logs:
@@ -67,7 +65,13 @@ functions:
       - Effect: Allow
         Action:
           - dynamodb:Query
-        Resource: !GetAtt TodosTable.Arn
+        Resource: !GetAtt TodosTable.Arn         
+      - Effect: 'Allow'        
+        Action:
+          - 'xray:PutTraceSegments'            
+          - 'xray:PutTelemetryRecords'         
+        Resource:
+          - '*'
 
   # TODO: Configure this function - 
   # Provide iamRoleStatements property. Decide the Actions and AWS Resource. 
@@ -89,6 +93,12 @@ functions:
         Action:
           - dynamodb:PutItem
         Resource: !GetAtt TodosTable.Arn
+      - Effect: 'Allow'        
+        Action:
+          - 'xray:PutTraceSegments'            
+          - 'xray:PutTelemetryRecords'         
+        Resource:
+          - '*'
   # TODO: Configure this function
   # Provide property for setting up CORS, Authorizer, iamRoleStatements, and request schemas
   UpdateTodo:
@@ -107,6 +117,12 @@ functions:
         Action:
           - dynamodb:UpdateItem
         Resource: !GetAtt TodosTable.Arn
+      - Effect: 'Allow'        
+        Action:
+          - 'xray:PutTraceSegments'            
+          - 'xray:PutTelemetryRecords'         
+        Resource:
+          - '*'
 
   # TODO: Configure this function
   # Provide property for setting up CORS, Authorizer, iamRoleStatements
@@ -123,6 +139,12 @@ functions:
         Action:
           - dynamodb:DeleteItem
         Resource: !GetAtt TodosTable.Arn
+      - Effect: 'Allow'        
+        Action:
+          - 'xray:PutTraceSegments'            
+          - 'xray:PutTelemetryRecords'         
+        Resource:
+          - '*'
 
   FindTodos:
     handler: src/lambda/http/findTodo.handler
@@ -140,6 +162,12 @@ functions:
         Action:
           - dynamodb:Query
         Resource: !GetAtt TodosTable.Arn
+      - Effect: 'Allow'        
+        Action:
+          - 'xray:PutTraceSegments'            
+          - 'xray:PutTelemetryRecords'         
+        Resource:
+          - '*'
 
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
@@ -159,6 +187,12 @@ functions:
         Action:
           - dynamodb:UpdateItem
         Resource: !GetAtt TodosTable.Arn
+      - Effect: 'Allow'        
+        Action:
+          - 'xray:PutTraceSegments'            
+          - 'xray:PutTelemetryRecords'         
+        Resource:
+          - '*'
 
 resources:
   Resources:

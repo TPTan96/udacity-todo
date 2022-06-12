@@ -5,7 +5,7 @@ import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate';
 
-const XAWS = AWSXRay.captureAWS(AWS)
+const XAWS = AWSXRay.captureAWS(AWS); // enabled X-Ray tracing
 
 const logger = createLogger('TodosAccess data')
 
@@ -89,19 +89,19 @@ export class TodosAccess {
     }
 
     async deleteTodo(todoId: string, userId: string) {
-    
-        await this.docClient.delete({
-          TableName: this.todosTable,
-          Key: {
-            userId: userId,
-            todoId: todoId
-          }
-        }).promise();
-    
-        logger.info(`Deleting TODO ${todoId} successfully`);
-      }
 
-      async findTodo(userId: string, name: string): Promise<TodoItem[]> {
+        await this.docClient.delete({
+            TableName: this.todosTable,
+            Key: {
+                userId: userId,
+                todoId: todoId
+            }
+        }).promise();
+
+        logger.info(`Deleting TODO ${todoId} successfully`);
+    }
+
+    async findTodo(userId: string, name: string): Promise<TodoItem[]> {
 
         const result = await this.docClient.query({
             TableName: this.todosTable,
@@ -125,6 +125,6 @@ function createDynamoDBClient(): DocumentClient {
     const client = new AWS.DynamoDB.DocumentClient({
         service: service
     });
-    AWSXRay.captureAWSClient(service);
+    // AWSXRay.captureAWSClient(service);
     return client;
 }
